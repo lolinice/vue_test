@@ -19,21 +19,74 @@
 <div id="demo">
   姓: <input type="text" placeholder="First Name" v-model="firstName"><br>
   名: <input type="text" placeholder="Last Name" v-model="lastName"><br>
-  姓名1(单向): <input type="text" placeholder="Full Name1"><br>
-  姓名2(单向): <input type="text" placeholder="Full Name2"><br>
-  姓名3(双向): <input type="text" placeholder="Full Name3"><br>
+  姓名1(单向): <input type="text" placeholder="Full Name1" v-model="fullName1"><br>
+  姓名2(单向): <input type="text" placeholder="Full Name2" v-model="fullName2"><br>
+  姓名3(双向): <input type="text" placeholder="Full Name3" v-model="fullName3"><br>
+  <p>{{fullName3}}</p>
+  <p>{{fullName3}}</p>
 </div>
+
 
 <script type="text/javascript" src="../js/vue.js"></script>
 <script type="text/javascript">
   var vm = new Vue({
       el:'#demo',
-      data:{
-          firstName:'Jian',
-          lastName:'Yi',
-          fullName:''
+
+      data(){
+          return{ //vm具有所有的属性
+              firstName:'Jian',
+              lastName:'Yi',
+              //fullName1:'JianYi'
+              fullName2:'Jian Yi'
+          }
+      },
+      //计算属性
+      computed:{
+          //内部使用的属性的get方法，动态计算返回一个数据
+          fullName1(){ //初始化显示，以来的data数据发生了变化时自动调用
+              console.log('fullName1',this); //this是vm Vue$3
+              return this.firstName + ' ' + this.lastName
+          },
+
+          fullName3:{
+              //回掉函数，显示value时调用，用来根据vm其它的数据来计算返回结果
+              get(){
+                  console.log('fullName3 get()调用次数');//1
+                  return this.firstName + ' ' + this.lastName
+              },
+              //回掉函数，属性值发生改变时调用，用来监视当前属性值的变化，更新相关的属性数据
+              set(value){
+                  const names = value.split(' ') //分割
+                  this.firstName = names[0]
+                  this.lastName = names[1]
+              }
+          }
+      },
+
+      //监视属性
+      watch:{ //监视vm的属性变化
+          firstName(value){ //监视的回掉函数，value是firstName最新的值，当firstName发生了改变时自动调用
+              //更新fullName2
+              this.fullName2 = value + ' ' + this.lastName
+          }
       }
+
   })
+  //监视vm的lastName属性 -->实例的方法
+  vm.$watch('lastName',function (value) { //value是lastName最新的值，当lastName发生了改变时自动调用
+      this.fullName2 = this.firstName + ' ' + value
+  })
+
+
+  
+  console.log(vm); //Vue$3{}
+  /*
+  todo data两种写法：
+  data:{} 对象
+  data(){return{}} data是一个函数，但是必须返回一个对象
+
+  todo Vue实例的属性和方法都加上$ -- vm.$watch
+  */
 </script>
 </body>
 </html>
